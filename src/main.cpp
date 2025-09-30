@@ -24,8 +24,7 @@ static glm::mat4 g_model = glm::mat4(
     1.0f, 0.0f, 0.0f, 0.0f,
     0.0f, 1.0f, 0.0f, 0.0f,
     0.0f, 0.0f, 1.0f, 0.0f,
-    0.0f, 0.0f, 0.0f, 1.0f
-);
+    0.0f, 0.0f, 0.0f, 1.0f);
 
 static glm::vec3 g_light_pos = glm::vec3(1.0f, 1.0f, 2.0f);
 static glm::vec3 g_light_color = glm::vec3(1.0f); /* White light */
@@ -55,7 +54,7 @@ static unsigned int gl_print_error(void)
 /*
  * Window error event callback.
  */
-static void glfw_error_callback(int error, const char* description)
+static void glfw_error_callback(int error, const char *description)
 {
     std::cerr << "GLFW Error: " << error << " " << description << std::endl;
 }
@@ -63,7 +62,7 @@ static void glfw_error_callback(int error, const char* description)
 /*
  * Window keypress event callback.
  */
-static void key_callback(GLFWwindow* window,
+static void key_callback(GLFWwindow *window,
                          int key,
                          int scancode,
                          int action,
@@ -71,35 +70,47 @@ static void key_callback(GLFWwindow* window,
 {
     switch (key)
     {
-        case GLFW_KEY_ESCAPE:
-            /* Close on escape. */
-            glfwSetWindowShouldClose(window, true);
-            break;
-        case GLFW_KEY_X:
-            /* For debugging. */
-            gl_print_error();
-            break;
-        case GLFW_KEY_A:
-            g_model = glm::rotate(g_model,
-                                  glm::radians(5.0f),
-                                  glm::vec3(0.0f, 1.0f, 0.0f));
-            set_model(g_program);
-            break;
-        case GLFW_KEY_D:
-            break;
-        case GLFW_KEY_W:
-            break;
-        case GLFW_KEY_S:
-            break;
-        default:
-            break;
+    case GLFW_KEY_ESCAPE:
+        /* Close on escape. */
+        glfwSetWindowShouldClose(window, true);
+        break;
+    case GLFW_KEY_X:
+        /* For debugging. */
+        gl_print_error();
+        break;
+    case GLFW_KEY_F:
+        // 2.1 Change the rotation vector
+        g_model = glm::rotate(g_model,
+                              glm::radians(5.0f),
+                              glm::vec3(1.0f, 0.0f, 1.0f));
+        set_model(g_program);
+        break;
+        // 2.2 Bind more key to do translate and scale
+    case GLFW_KEY_A:
+        g_model = glm::translate(g_model, glm::vec3(-1.0f, 0.0f, -1.0f));
+        set_model(g_program);
+        break;
+    case GLFW_KEY_D:
+        g_model = glm::translate(g_model, glm::vec3(1.0f, 0.0f, 1.0f));
+        set_model(g_program);
+        break;
+    case GLFW_KEY_W:
+        g_model = glm::scale(g_model, glm::vec3(2.0f, 2.0f, 2.0f));
+        set_model(g_program);
+        break;
+    case GLFW_KEY_S:
+        g_model = glm::scale(g_model, glm::vec3(-2.0f, -2.0f, -2.0f));
+        set_model(g_program);
+        break;
+    default:
+        break;
     }
 }
 
 /*
  * Window resize event callback.
  */
-static void size_callback(GLFWwindow* window, int width, int height)
+static void size_callback(GLFWwindow *window, int width, int height)
 {
     if (width == 0 || height == 0)
         return;
@@ -112,7 +123,7 @@ static void size_callback(GLFWwindow* window, int width, int height)
 /*
  * Create window.
  */
-GLFWwindow* init_window(void)
+GLFWwindow *init_window(void)
 {
     glfwSetErrorCallback(glfw_error_callback);
 
@@ -135,7 +146,7 @@ GLFWwindow* init_window(void)
     /*
      * Create the graphics context and make it current.
      */
-    GLFWwindow* const window = glfwCreateWindow(cg::window.window_width,
+    GLFWwindow *const window = glfwCreateWindow(cg::window.window_width,
                                                 cg::window.window_height,
                                                 cg::window.window_title,
                                                 nullptr,
@@ -181,7 +192,7 @@ static void clear(void)
 /*
  * Destroy window.
  */
-static void cleanup_window(GLFWwindow* window)
+static void cleanup_window(GLFWwindow *window)
 {
     glfwDestroyWindow(window);
     glfwTerminate();
@@ -190,7 +201,7 @@ static void cleanup_window(GLFWwindow* window)
 /*
  * Read shader from file.
  */
-static std::optional<std::string> read_shader(const std::string& path)
+static std::optional<std::string> read_shader(const std::string &path)
 {
     std::string result;
 
@@ -221,7 +232,7 @@ static unsigned int compile_shader(const std::string shader_source,
 {
     unsigned int shader = glCreateShader(type);
 
-    const char* c_str = shader_source.c_str();
+    const char *c_str = shader_source.c_str();
     glShaderSource(shader, 1, &c_str, nullptr);
 
     glCompileShader(shader);
@@ -253,8 +264,8 @@ static unsigned int compile_shader(const std::string shader_source,
 /*
  * Compile and link shader program.
  */
-static unsigned int create_shader(const std::string& vertex_source,
-                                  const std::string& fragment_source)
+static unsigned int create_shader(const std::string &vertex_source,
+                                  const std::string &fragment_source)
 {
     unsigned int program = glCreateProgram();
     unsigned int vertex_shader = compile_shader(vertex_source, GL_VERTEX_SHADER);
@@ -278,23 +289,22 @@ static unsigned int create_shader(const std::string& vertex_source,
     return program;
 }
 
-int get_uniform_location(unsigned int program, const std::string& location)
+int get_uniform_location(unsigned int program, const std::string &location)
 {
     if (g_uniform_locations.find(location) != g_uniform_locations.end())
         return g_uniform_locations[location];
 
     int uniform = glGetUniformLocation(program, location.c_str());
     if (uniform == -1)
-        std::cout << "Warning: Uniform " << location <<
-        " does not exist. This uniform will not be set." << std::endl;
+        std::cout << "Warning: Uniform " << location << " does not exist. This uniform will not be set." << std::endl;
 
     g_uniform_locations[location] = uniform;
     return uniform;
 }
 
 static void set_vec3(unsigned int program,
-                     const glm::vec3& vector,
-                     const std::string& location)
+                     const glm::vec3 &vector,
+                     const std::string &location)
 {
     int uniform = get_uniform_location(program, location);
     if (uniform == -1)
@@ -303,8 +313,8 @@ static void set_vec3(unsigned int program,
 }
 
 static void set_matrix(unsigned int program,
-                       const glm::mat4& matrix,
-                       const std::string& location)
+                       const glm::mat4 &matrix,
+                       const std::string &location)
 {
     int uniform = get_uniform_location(program, location);
     if (uniform == -1)
@@ -372,62 +382,61 @@ static unsigned int init_vbo(void)
      * Cube.
      */
     std::array<float, 288> vertices =
-    {
-    /* Position            Normal                Texture Coords */
-    /* Front face */
-    -0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   1.0f, 1.0f,
+        {
+            /* Position            Normal                Texture Coords */
+            /* Front face */
+            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+            0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+            0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
 
-     0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   0.0f, 0.0f,
+            0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+            -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
 
-    /* Back face */
-    -0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
+            /* Back face */
+            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+            0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
+            0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
 
-     0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
+            0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
+            -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
 
-    /* Left face */
-    -0.5f, -0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,   1.0f, 1.0f,
+            /* Left face */
+            -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+            -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+            -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
 
-    -0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,   1.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
+            -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+            -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 
-    /* Right face */
-     0.5f, -0.5f, -0.5f,   1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,   1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,   1.0f,  0.0f,  0.0f,   1.0f, 1.0f,
+            /* Right face */
+            0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+            0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+            0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
 
-     0.5f,  0.5f,  0.5f,   1.0f,  0.0f,  0.0f,   1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,   1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,   1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
+            0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+            0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+            0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 
-    /* Top face */
-    -0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,   1.0f, 1.0f,
+            /* Top face */
+            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+            0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+            0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
 
-     0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,   1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 0.0f,
+            0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+            -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
 
-    /* Bottom face */
-    -0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,   0.0f, -1.0f,  0.0f,   1.0f, 1.0f,
+            /* Bottom face */
+            -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+            0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+            0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,
 
-     0.5f, -0.5f,  0.5f,   0.0f, -1.0f,  0.0f,   1.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 0.0f
-    };
+            0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,
+            -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f};
 
     unsigned int vbo = 0;
     glGenBuffers(1, &vbo);
@@ -450,19 +459,19 @@ static unsigned int init_vao(void)
     /*
      * Position attribute.
      */
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
     /*
      * Normal attribute.
      */
-    glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     /*
      * Texture coordinate attribute.
      */
-    glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * sizeof(float), (void *)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
     return vao;
@@ -471,15 +480,15 @@ static unsigned int init_vao(void)
 /*
  * Load and bind texture image.
  */
-static unsigned int init_texture(const std::string& path)
+static unsigned int init_texture(const std::string &path)
 {
     int texture_width = 0;
-    int texture_height= 0;
+    int texture_height = 0;
     int texture_bpp = 0;
 
     stbi_set_flip_vertically_on_load(1);
 
-    unsigned char* texture_data = stbi_load(path.c_str(),
+    unsigned char *texture_data = stbi_load(path.c_str(),
                                             &texture_width,
                                             &texture_height,
                                             &texture_bpp,
@@ -525,8 +534,8 @@ static unsigned int init_texture(const std::string& path)
 /*
  * Shader setup.
  */
-static unsigned int init_program(const std::string& vertex_path,
-                                 const std::string& fragment_path)
+static unsigned int init_program(const std::string &vertex_path,
+                                 const std::string &fragment_path)
 {
     const auto vertex_source = read_shader(vertex_path);
     const auto fragment_source = read_shader(fragment_path);
@@ -607,7 +616,7 @@ static void render(void)
  */
 static void run(void)
 {
-    GLFWwindow* window = init_window();
+    GLFWwindow *window = init_window();
     if (window == nullptr)
         std::exit(1);
 
@@ -647,4 +656,3 @@ int main(void)
      */
     run();
 }
-
